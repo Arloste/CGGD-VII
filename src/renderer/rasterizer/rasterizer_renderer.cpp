@@ -11,7 +11,7 @@ void cg::renderer::rasterization_renderer::init()
 	rasterizer -> set_render_target(render_target);
 
 	model = std::make_shared<cg::world::model>();
-	model ->load_obj(settings -> model_path);
+	model -> load_obj(settings -> model_path);
 
 
 	// TODO: Lab 1.04. Setup an instance of camera `cg::world::camera` class in `cg::renderer::rasterization_renderer`
@@ -31,6 +31,7 @@ void cg::renderer::rasterization_renderer::render()
 
 	// TODO: Lab 1.04. Implement `vertex_shader` lambda for the instance of `cg::renderer::rasterizer`
 	// TODO: Lab 1.05. Implement `pixel_shader` lambda for the instance of `cg::renderer::rasterizer`
+
 
 	cg::utils::save_resource(*render_target, settings->result_path);
 

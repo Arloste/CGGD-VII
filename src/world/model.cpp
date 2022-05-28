@@ -29,7 +29,7 @@ void cg::world::model::load_obj(const std::filesystem::path& model_path)
 
 	auto& attrib = reader.GetAttrib();
 	auto& shapes = reader.GetShapes();
-	auto& materialos = reader.GetMaterials();
+	auto& materials = reader.GetMaterials();
 	textures.resize(shapes.size());
 
 	for (size_t s=0; s<shapes.size(); s++)
