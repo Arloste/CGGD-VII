@@ -141,7 +141,7 @@ namespace cg
 		float x, y, z;		// position
 		float nx, ny, nz;	//
 		float u, v; 		// texture coordinates (2D)
-		float anbient_r, anbient_g, anbient_b;	  // additional; mostly used by artists
+		float ambient_r, ambient_g, ambient_b;	  // additional; mostly used by artists
 		float diffuse_r, diffuse_g, diffuse_b;	  // reflection
 		float emissive_r, emissive_g, emissive_b; // the light source
 	};
