@@ -17,8 +17,6 @@ void cg::renderer::rasterization_renderer::init()
 }
 void cg::renderer::rasterization_renderer::render()
 {
-	// TODO: Lab 1.02. Implement image clearing & saving in `cg::renderer::rasterization_renderer` class
-
 	rasterizer ->clear_render_target({123, 234, 12});
 
 	cg::utils::save_resource(*render_target, settings->result_path);
