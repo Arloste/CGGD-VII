@@ -17,7 +17,8 @@ namespace cg::renderer
 	{
 	public:
 		rasterizer(){};
-		~rasterizer(){};
+		constexpr static const float FLT_MAX = 0;
+
 		void set_render_target(
 				std::shared_ptr<resource<RT>> in_render_target,
 				std::shared_ptr<resource<float>> in_depth_buffer = nullptr);
@@ -112,6 +113,7 @@ namespace cg::renderer
 	rasterizer<VB, RT>::edge_function(float2 a, float2 b, float2 c)
 	{
 		// TODO: Lab 1.05. Implement `cg::renderer::rasterizer::edge_function` method
+		return 0;
 
 	}
 
