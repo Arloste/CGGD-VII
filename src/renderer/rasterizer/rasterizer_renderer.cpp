@@ -41,7 +41,7 @@ void cg::renderer::rasterization_renderer::render()
 	{
 		auto processed = mul(matrix, vertex);
 		return std::make_pair(processed, vertex_data);
-	};`
+	};
 
 	rasterizer ->pixel_shader = [](cg::vertex vertex_data, float z)
 		{return cg::color{vertex_data.ambient_r, vertex_data.ambient_g, vertex_data.ambient_b};};
