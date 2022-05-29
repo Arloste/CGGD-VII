@@ -61,8 +61,18 @@ void cg::world::camera::set_z_far(float in_z_far)
 
 const float4x4 cg::world::camera::get_view_matrix() const
 {
-	// TODO: Lab 1.04. Implement `cg::world::camera` class
-	return float4x4 {};
+	float3 up {0.f, 1.f, 0.f};
+	float3 eye = position + get_direction();
+
+	float3 z_axis = normalize(position - eye);
+	float3 x_axis = normalize(cross(up, z_axis));
+	float3 y_axis = cross(z_axis, x_axis);
+
+	return float4x4 {
+		{x_axis.x, y_axis.x, z_axis.x, 0},
+		{x_axis.y, y_axis.y, z_axis.y, 0},
+		{x_axis.z, y_axis.z, z_axis.z, 0},
+		{-dot(x_axis, position), -dot(y_axis, position), -dot(z_axis, position), 1} };
 }
 
 #ifdef DX12
@@ -84,40 +94,44 @@ const DirectX::XMMATRIX camera::get_dxm_mvp_matrix() const
 
 const float4x4 cg::world::camera::get_projection_matrix() const
 {
-	// TODO: Lab 1.04. Implement `cg::world::camera` class
-	return float4x4 {};
+	float f = 1.f / tanf(angle_of_view/2.f);
+	return float4x4 {
+			{f/aspect_ratio, 0, 0, 0},
+			{0, f, 0, 0},
+			{0, 0, z_far/(z_near - z_far), -1},
+			{0, 0, (z_far*z_near)/(z_near - z_far), 0} };
 }
 
 const float3 cg::world::camera::get_position() const
 {
-	// TODO: Lab 1.04. Implement `cg::world::camera` class
-	return float3 {};
+	return position;
 }
 
 const float3 cg::world::camera::get_direction() const
 {
-	// TODO: Lab 1.04. Implement `cg::world::camera` class
-	return float3 {};
+	return float3 {
+			sin(theta)*cos(phi),
+			sin(phi),
+			-cos(theta) * cos(phi) };
+
 }
 
 const float3 cg::world::camera::get_right() const
 {
-	// TODO: Lab 1.04. Implement `cg::world::camera` class
-	return float3 {};
+	return cross(get_direction(), float3{0, 1, 0});
 }
 
 const float3 cg::world::camera::get_up() const
 {
-	// TODO: Lab 1.04. Implement `cg::world::camera` class
-	return float3{};
+	return cross(get_right(), get_direction());
 }
+
 const float camera::get_theta() const
 {
-	// TODO: Lab 1.04. Implement `cg::world::camera` class
-	return 0.f;
+	return theta;
 }
+
 const float camera::get_phi() const
 {
-	// TODO: Lab 1.04. Implement `cg::world::camera` class
-	return 0.f;
+	return phi;
 }
