@@ -9,11 +9,9 @@ v -0.5 -0.5 -0.5
 v 0.5 -0.5 -0.5
 v 0.0 0.5 0.5
 
-g leftWall
-usemtl leftWall
-f 3 2 1
-f 1 2 3
 g rightWall
 usemtl rightWall
-f 6 5 4
+f 1 2 3
+g leftWall
+usemtl leftWall
 f 4 5 6
