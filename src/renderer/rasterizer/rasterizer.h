@@ -2,6 +2,7 @@
 
 #include "resource.h"
 
+#include "cfloat"
 #include <functional>
 #include <iostream>
 #include <linalg.h>
@@ -17,7 +18,7 @@ namespace cg::renderer
 	{
 	public:
 		rasterizer(){};
-		constexpr static const float FLT_MAX = 0;
+		~rasterizer(){};
 
 		void set_render_target(
 				std::shared_ptr<resource<RT>> in_render_target,
@@ -30,7 +31,7 @@ namespace cg::renderer
 
 		void set_viewport(size_t in_width, size_t in_height);
 
-		void draw(size_t num_vertexes, size_t vertex_offest);
+		void draw(size_t num_vertexes, size_t vertex_offset);
 
 		std::function<std::pair<float4, VB>(float4 vertex, VB vertex_data)> vertex_shader;
 		std::function<cg::color(const VB& vertex_data, const float z)> pixel_shader;
@@ -143,6 +144,11 @@ namespace cg::renderer
 							0.f,
 							static_cast<float>(height-1)) };
 
+			float edge = edge_function(
+					float2 {vertices[0].x, vertices[0].y},
+					float2 {vertices[1].x, vertices[1].y},
+					float2 {vertices[2].x, vertices[2].y});
+
 			for (int x=static_cast<int>(bounding_box_begin.x); x<=static_cast<int>(bounding_box_end.x); x++)
 			{
 				for (int y=static_cast<int>(bounding_box_begin.y); y<=static_cast<int>(bounding_box_end.y); y++)
@@ -165,9 +171,19 @@ namespace cg::renderer
 
 					if (edge0 >= 0.f && edge1 >= 0.f && edge2 >= 0.f)
 					{
-						auto pixel_result = pixel_shader(vertices[0], 0.f);
-						render_target ->item(x, y) = RT::from_color(pixel_result);
+						float u = edge1 / edge;
+						float v = edge2 / edge;
+						float w = edge0 / edge;
+						float depth = u*vertices[0].z + v*vertices[1].z + w*vertices[2].z;
 
+						if (depth_test(depth, x, y))
+						{
+							auto pixel_result = pixel_shader(vertices[0], depth);
+							render_target ->item(x, y) = RT::from_color(pixel_result);
+
+							if (depth_buffer)
+								depth_buffer ->item(x, y) = depth;
+						}
 					}
 				}
 			}
@@ -187,7 +203,9 @@ namespace cg::renderer
 	template<typename VB, typename RT>
 	inline bool rasterizer<VB, RT>::depth_test(float z, size_t x, size_t y)
 	{
-		// TODO: Lab 1.06. Implement depth_test function of cg::renderer::rasterizer class
+		if (!depth_buffer)
+			return true;
+		return depth_buffer ->item(x, y) > z;
 	}
 
 }// namespace cg::renderer
