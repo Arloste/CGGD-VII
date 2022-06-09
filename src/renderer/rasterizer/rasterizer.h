@@ -188,8 +188,6 @@ namespace cg::renderer
 				}
 			}
 		}
-
-		// TODO: Lab 1.06. Add Depth test stage to draw method of cg::renderer::rasterizer
 	}
 
 	template<typename VB, typename RT>
