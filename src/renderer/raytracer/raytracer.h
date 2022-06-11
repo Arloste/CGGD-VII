@@ -219,7 +219,29 @@ namespace cg::renderer
 		if (depth--==0) return miss_shader(ray);
 		return miss_shader(ray);
 
-		// TODO: Lab 2.02. Adjust trace_ray method of raytracer class to traverse geometry and call a closest hit shader
+		payload closest_hit_payload = {};
+		closest_hit_payload.t = max_t;
+		const triangle<VB>* closest_triangle = nullptr;
+
+		for (auto& triange: triangles)
+		{
+			payload payload = intersection_shader(triange, ray);
+			if (payload.t>min_t && payload.t<closest_hit_payload.t)
+			{
+				closest_hit_payload = payload;
+				closest_triangle = &triange;
+			}
+		}
+
+		if (closest_hit_payload.t<max_t)
+		{
+			if (closest_hit_shader)
+				return closest_hit_shader(ray,
+										  closest_hit_payload,
+										  *closest_triangle,
+										  depth);
+		}
+
 		// TODO: Lab 2.04. Adjust `trace_ray` method of `raytracer` to use `any_hit_shader`
 		// TODO: Lab 2.05. Adjust trace_ray method of raytracer class to traverse the acceleration structure
 	}
