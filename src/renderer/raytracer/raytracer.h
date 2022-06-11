@@ -188,7 +188,7 @@ namespace cg::renderer
 	inline payload raytracer<VB, RT>::trace_ray(
 			const ray& ray, size_t depth, float max_t, float min_t) const
 	{
-		if (--depth==0) return miss_shader(ray);
+		if (depth--==0) return miss_shader(ray);
 		return miss_shader(ray);
 
 		// TODO: Lab 2.02. Adjust trace_ray method of raytracer class to traverse geometry and call a closest hit shader
