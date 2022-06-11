@@ -216,7 +216,8 @@ namespace cg::renderer
 	inline payload raytracer<VB, RT>::trace_ray(
 			const ray& ray, size_t depth, float max_t, float min_t) const
 	{
-		if (depth--==0) return miss_shader(ray);
+		if (depth==0) return miss_shader(ray);
+		depth--;
 		return miss_shader(ray);
 
 		payload closest_hit_payload = {};
