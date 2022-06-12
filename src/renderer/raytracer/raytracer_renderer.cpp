@@ -36,8 +36,6 @@ void cg::renderer::ray_tracing_renderer::init()
 			float3 {0.78f, 0.78f, 0.78f}});
 
 	shadow_raytracer = std::make_shared<cg::renderer::raytracer<cg::vertex, cg::unsigned_color>>();
-	shadow_raytracer ->set_vertex_buffers(model ->get_vertex_buffers());
-	shadow_raytracer ->set_index_buffers(model ->get_index_buffers());
 }
 
 void cg::renderer::ray_tracing_renderer::destroy() {}
@@ -91,8 +89,8 @@ void cg::renderer::ray_tracing_renderer::render()
 										  const triangle<cg::vertex>& triangle){
 		return payload;
 	};
-	
-	shadow_raytracer ->build_acceleration_structure();
+
+	shadow_raytracer ->acceleration_structures = raytracer ->acceleration_structures;
 
 	auto start = std::chrono::high_resolution_clock::now();
 	raytracer ->ray_generation(camera ->get_position(),
@@ -107,7 +105,4 @@ void cg::renderer::ray_tracing_renderer::render()
 	std::cout << "Raytracing took " << raytracing_duration.count() << "ms" << '\n';
 
 	cg:utils::save_resource(*render_target, settings ->result_path);
-
-	// TODO: Lab 2.04. Adjust closest_hit_shader of raytracer to cast shadows rays and to ignore occluded lights
-	// TODO: Lab 2.05. Adjust ray_tracing_renderer class to build the acceleration structure
 }
