@@ -54,7 +54,6 @@ namespace cg::renderer
 	inline triangle<VB>::triangle(
 			const VB& vertex_a, const VB& vertex_b, const VB& vertex_c)
 	{
-		// TODO: Lab 2.02. Implement a constructor of triangle struct
 		a = float3 {vertex_a.x, vertex_a.y, vertex_a.z};
 		b = float3 {vertex_b.x, vertex_b.y, vertex_b.z};
 		c = float3 {vertex_c.x, vertex_c.y, vertex_c.z};
@@ -68,8 +67,6 @@ namespace cg::renderer
 		ambient = {vertex_a.ambient_r, vertex_a.ambient_g, vertex_a.ambient_b};
 		diffuse = {vertex_a.diffuse_r, vertex_a.diffuse_g, vertex_a.diffuse_b};
 		emissive = {vertex_a.emissive_r, vertex_a.emissive_g, vertex_a.emissive_b};
-
-
 	}
 
 	template<typename VB>
@@ -201,7 +198,7 @@ namespace cg::renderer
 					  v = (2.f*y)/static_cast<float>(height-1) - 1.f;
 				u *= static_cast<float>(width)/static_cast<float>(height);
 				float3 ray_direction = direction + u*right - v*up;
-				ray ray(position, direction);
+				ray ray(position, ray_direction);
 
 				payload payload = trace_ray(ray, depth);
 				render_target ->item(x, y) = RT::from_color(payload.color);
@@ -218,7 +215,6 @@ namespace cg::renderer
 	{
 		if (depth==0) return miss_shader(ray);
 		depth--;
-		return miss_shader(ray);
 
 		payload closest_hit_payload = {};
 		closest_hit_payload.t = max_t;
@@ -242,6 +238,8 @@ namespace cg::renderer
 										  *closest_triangle,
 										  depth);
 		}
+
+		return miss_shader(ray);
 
 		// TODO: Lab 2.04. Adjust `trace_ray` method of `raytracer` to use `any_hit_shader`
 		// TODO: Lab 2.05. Adjust trace_ray method of raytracer class to traverse the acceleration structure

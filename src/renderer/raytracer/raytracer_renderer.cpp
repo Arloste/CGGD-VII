@@ -42,8 +42,7 @@ void cg::renderer::ray_tracing_renderer::update() {}
 void cg::renderer::ray_tracing_renderer::render()
 {
 	raytracer ->clear_render_target({0, 0, 0});
-	raytracer ->miss_shader = [](const ray& ray)
-	{
+	raytracer ->miss_shader = [](const ray& ray){
 		payload payload{};
 		payload.color = {0.f, 0.f, (ray.direction.y + 1.f)*0.5f};
 		return payload;
