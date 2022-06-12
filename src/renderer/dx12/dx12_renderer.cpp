@@ -43,6 +43,7 @@ void cg::renderer::dx12_renderer::render()
 ComPtr<IDXGIFactory4> cg::renderer::dx12_renderer::get_dxgi_factory()
 {
 	UINT dxgi_factory_flags = 0;
+
 #ifdef _DEBUG
 	ComPtr<ID3D12Debug> debug_controller;
 	if (SUCCEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debug_controller))))
@@ -52,7 +53,9 @@ ComPtr<IDXGIFactory4> cg::renderer::dx12_renderer::get_dxgi_factory()
 	}
 #endif
 
-	// TODO Lab 3.02. Create a DXGI factory
+	ComPtr <IDXGIFactory4> dxgi_factory;
+	THROW_IF_FAILED(CreateDXGIFactory2(dxgi_factory_flags, IID_PPV_ARGS(&dxgi_factory)));
+	return dxgi_factory;
 }
 
 void cg::renderer::dx12_renderer::initialize_device(ComPtr<IDXGIFactory4>& dxgi_factory)
