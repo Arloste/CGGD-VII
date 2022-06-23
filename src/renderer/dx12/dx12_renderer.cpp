@@ -208,7 +208,12 @@ void cg::renderer::dx12_renderer::create_constant_buffer_view(const ComPtr<ID3D1
 
 void cg::renderer::dx12_renderer::load_assets()
 {
-	// TODO Lab 3.03. Allocate memory for vertex and index buffers
+	vertex_buffers.resize(model ->get_vertex_buffers().size());
+	vertex_buffer_views.resize(model ->get_vertex_buffers().size());
+
+	index_buffers.resize(model ->get_index_buffers().size());
+	index_buffer_views.resize(model ->get_index_buffers().size());
+
 	// TODO Lab 3.03. Create committed resources for vertex, index and constant buffers on upload heap
 	// TODO Lab 3.03. Copy resource data to suitable resources
 	// TODO Lab 3.04. Create a descriptor heap for a constant buffer
@@ -242,13 +247,16 @@ void cg::renderer::descriptor_heap::create_heap(ComPtr<ID3D12Device>& device, D3
 D3D12_CPU_DESCRIPTOR_HANDLE cg::renderer::descriptor_heap::get_cpu_descriptor_handle(UINT index) const
 {
 	// TODO Lab 3.04. Implement `create_heap`, `get_cpu_descriptor_handle`, `get_gpu_descriptor_handle`, and `get` methods of `cg::renderer::descriptor_heap`
+	return {};
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE cg::renderer::descriptor_heap::get_gpu_descriptor_handle(UINT index) const
 {
 	// TODO Lab 3.04. Implement `create_heap`, `get_cpu_descriptor_handle`, `get_gpu_descriptor_handle`, and `get` methods of `cg::renderer::descriptor_heap`
+	return {};
 }
 ID3D12DescriptorHeap* cg::renderer::descriptor_heap::get() const
 {
 	// TODO Lab 3.04. Implement `create_heap`, `get_cpu_descriptor_handle`, `get_gpu_descriptor_handle`, and `get` methods of `cg::renderer::descriptor_heap`
+	return {};
 }
