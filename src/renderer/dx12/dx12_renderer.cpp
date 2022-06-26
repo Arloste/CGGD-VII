@@ -54,7 +54,7 @@ ComPtr<IDXGIFactory4> cg::renderer::dx12_renderer::get_dxgi_factory()
 #endif
 
 	ComPtr <IDXGIFactory4> dxgi_factory;
-	THROW_IF_FAILED(CreateDXGIFactory2(dxgi_factory_flags, IID_PPV_ARGS(&dxgi_factory)));
+	THROW_IF_FAILED(CreateDXGIFactory2(dxgi_factory_flags, IID_PPV_ARGS(&dxgi_factory)))
 	return dxgi_factory;
 }
 
@@ -70,7 +70,7 @@ void cg::renderer::dx12_renderer::initialize_device(ComPtr<IDXGIFactory4>& dxgi_
 #endif
 	THROW_IF_FAILED(D3D12CreateDevice(hardware_adapter.Get(),
 					  D3D_FEATURE_LEVEL_11_0,
-					  IID_PPV_ARGS(&device)));
+					  IID_PPV_ARGS(&device)))
 }
 
 void cg::renderer::dx12_renderer::create_direct_command_queue()
@@ -133,12 +133,23 @@ void cg::renderer::dx12_renderer::create_depth_buffer()
 
 void cg::renderer::dx12_renderer::create_command_allocators()
 {
-	// TODO Lab 3.06. Create command allocators and a command list
+	for (auto& command_allocator: command_allocators)
+	{
+		THROW_IF_FAILED(device ->CreateCommandAllocator(
+				D3D12_COMMAND_LIST_TYPE_DIRECT,
+				IID_PPV_ARGS(&command_allocator)))
+	}
 }
 
 void cg::renderer::dx12_renderer::create_command_list()
 {
 	// TODO Lab 3.06. Create command allocators and a command list
+	THROW_IF_FAILED(device ->CreateCommandList(
+			0,
+			D3D12_COMMAND_LIST_TYPE_DIRECT,
+			command_allocators[0].Get(),
+			pipeline_state.Get(),
+			IID_PPV_ARGS(&command_list)))
 }
 
 
@@ -189,7 +200,7 @@ void cg::renderer::dx12_renderer::create_root_signature(const D3D12_STATIC_SAMPL
 							rs_flags);
 	ComPtr <ID3DBlob> signature;
 	ComPtr <ID3DBlob> error;
-	HRESULT result = D3DX12SerializeVersionedRootSignature(&rs_descriptor,
+	HRESULT result = D3DX12SerializeVersionedRootSignature(&rs_description,
 														   rs_feature_data.HighestVersion,
 														   &signature,
 														   &error);
@@ -235,7 +246,7 @@ ComPtr<ID3DBlob> cg::renderer::dx12_renderer::compile_shader(const std::filesyst
 	if (FAILED(result))
 	{
 		OutputDebugStringA((char*)error->GetBufferPointer());
-		THROW_IF_FAILED(result);
+		THROW_IF_FAILED(result)
 	}
 
 	return shader;
@@ -348,6 +359,12 @@ void cg::renderer::dx12_renderer::create_constant_buffer_view(const ComPtr<ID3D1
 
 void cg::renderer::dx12_renderer::load_assets()
 {
+	create_root_signature(nullptr, 0);
+	create_pso("shaders.hlsl");
+	create_command_allocators();
+	create_command_list();
+	command_list ->Close();
+
 	vertex_buffers.resize(model ->get_vertex_buffers().size());
 	vertex_buffer_views.resize(model ->get_vertex_buffers().size());
 
