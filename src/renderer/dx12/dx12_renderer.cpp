@@ -4,7 +4,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include <filesystem>
-
+#include <d3d12sdklayers.h>
 
 void cg::renderer::dx12_renderer::init()
 {
@@ -46,7 +46,7 @@ ComPtr<IDXGIFactory4> cg::renderer::dx12_renderer::get_dxgi_factory()
 
 #ifdef _DEBUG
 	ComPtr<ID3D12Debug> debug_controller;
-	if (SUCCEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debug_controller))))
+	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debug_controller))))
 	{
 		debug_controller ->EnableDebugLayer();
 		dxgi_factory_flags |= DXGI_CREATE_FACTORY_DEBUG;
@@ -64,8 +64,8 @@ void cg::renderer::dx12_renderer::initialize_device(ComPtr<IDXGIFactory4>& dxgi_
 	dxgi_factory ->EnumAdapters1(0, &hardware_adapter);
 #ifdef _DEBUG
 	DXGI_ADAPTER_DESC adapter_desc = {};
-	hardwate_adapter ->GetDesc(&adapter_desc);
-	OutpitDebugString(adapter_desc.Description);
+	hardware_adapter ->GetDesc(&adapter_desc);
+	OutputDebugString(adapter_desc.Description);
 	OutputDebugString(L"\n");
 #endif
 	THROW_IF_FAILED(D3D12CreateDevice(hardware_adapter.Get(),
@@ -160,7 +160,7 @@ D3D12_STATIC_SAMPLER_DESC cg::renderer::dx12_renderer::get_sampler_descriptor()
 void cg::renderer::dx12_renderer::create_root_signature(const D3D12_STATIC_SAMPLER_DESC* sampler_descriptors, UINT num_sampler_descriptors)
 {
 	CD3DX12_ROOT_PARAMETER1 root_parameters[1];
-	CD3DX12_DESCRIPTION_RANGE1 ranges[1];
+	CD3DX12_DESCRIPTOR_RANGE1 ranges[1];
 
 	ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV,
 				   1,
@@ -168,10 +168,10 @@ void cg::renderer::dx12_renderer::create_root_signature(const D3D12_STATIC_SAMPL
 				   0,
 				   D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC);
 	root_parameters[0].InitAsDescriptorTable(1,
-											 &range[0],
+											 &ranges[0],
 											 D3D12_SHADER_VISIBILITY_VERTEX);
 	D3D12_FEATURE_DATA_ROOT_SIGNATURE rs_feature_data = {};
-	rs_signature_data.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
+	rs_feature_data.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
 
 	if (FAILED(device ->CheckFeatureSupport(D3D12_FEATURE_ROOT_SIGNATURE,
 										   &rs_feature_data,
@@ -191,7 +191,7 @@ void cg::renderer::dx12_renderer::create_root_signature(const D3D12_STATIC_SAMPL
 	ComPtr <ID3DBlob> error;
 	HRESULT result = D3DX12SerializeVersionedRootSignature(&rs_descriptor,
 														   rs_feature_data.HighestVersion,
-														   signature,
+														   &signature,
 														   &error);
 	if (FAILED(result))
 	{
@@ -301,7 +301,7 @@ void cg::renderer::dx12_renderer::create_constant_buffer_view(const ComPtr<ID3D1
 {
 	D3D12_CONSTANT_BUFFER_VIEW_DESC cbv_desc = {};
 	cbv_desc.BufferLocation = buffer ->GetGPUVirtualAddress();
-	cbv_desc.SizeInBytes = sizeof(cb) + 255 & ~255;
+	cbv_desc.SizeInBytes = (sizeof(cb) + 255) & ~255;
 
 	device ->CreateConstantBufferView(&cbv_desc,
 									 cpu_handler);
