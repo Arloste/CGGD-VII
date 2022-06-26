@@ -208,15 +208,15 @@ void cg::renderer::dx12_renderer::create_root_signature(const D3D12_STATIC_SAMPL
 	}
 
 	D3D12_ROOT_SIGNATURE_FLAGS rs_flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-	CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rs_description;
-	rs_description.Init_1_1(_countof(root_parameters),
+	CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rs_descriptor;
+	rs_descriptor.Init_1_1(_countof(root_parameters),
 							root_parameters,
 							0,
 							nullptr,
 							rs_flags);
 	ComPtr <ID3DBlob> signature;
 	ComPtr <ID3DBlob> error;
-	HRESULT result = D3DX12SerializeVersionedRootSignature(&rs_description,
+	HRESULT result = D3DX12SerializeVersionedRootSignature(&rs_descriptor,
 														   rs_feature_data.HighestVersion,
 														   &signature,
 														   &error);
@@ -286,8 +286,8 @@ void cg::renderer::dx12_renderer::create_pso(const std::string& shader_name)
 			{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 			{"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-			{"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 44, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-			{"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 2, 56, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			{"COLOR", 1, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			{"COLOR", 2, DXGI_FORMAT_R32G32B32_FLOAT, 0, 56, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 	};
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC pso_desc = {};
@@ -391,7 +391,7 @@ void cg::renderer::dx12_renderer::load_assets()
 	{
 		auto vertex_buffer_data = model -> get_vertex_buffers()[i];
 		const UINT vertex_buffer_size = static_cast <UINT>(vertex_buffer_data ->get_size_in_bytes());
-		std::wstring vertex_buffer_name(L"Vertex Buffer ");
+		std::wstring vertex_buffer_name(L"Vertex buffer ");
 		vertex_buffer_name += std::to_wstring(i);
 		create_resource_on_upload_heap(vertex_buffers[i],
 									   vertex_buffer_size,
@@ -403,7 +403,7 @@ void cg::renderer::dx12_renderer::load_assets()
 
 		auto index_buffer_data = model -> get_index_buffers()[i];
 		const UINT index_buffer_size = static_cast <UINT>(index_buffer_data ->get_size_in_bytes());
-		std::wstring index_buffer_name(L"Index Buffer ");
+		std::wstring index_buffer_name(L"Index buffer ");
 		index_buffer_name += std::to_wstring(i);
 		create_resource_on_upload_heap(index_buffers[i],
 									   index_buffer_size,
@@ -436,7 +436,7 @@ void cg::renderer::dx12_renderer::load_assets()
 	if (fence_event==nullptr)
 		THROW_IF_FAILED(HRESULT_FROM_WIN32(GetLastError()))
 
-	wait_for_gpu();
+//	wait_for_gpu();
 }
 
 
@@ -452,7 +452,7 @@ void cg::renderer::dx12_renderer::populate_command_list()
 	command_list ->SetGraphicsRootSignature(root_signature.Get());
 	ID3D12DescriptorHeap* heaps[] = {cbv_srv_heap.get()};
 	command_list ->SetDescriptorHeaps(_countof(heaps), heaps);
-	command_list ->SetComputeRootDescriptorTable(0, cbv_srv_heap.get_gpu_descriptor_handle(0));
+	command_list ->SetGraphicsRootDescriptorTable(0, cbv_srv_heap.get_gpu_descriptor_handle(0));
 	command_list ->RSSetViewports(1, &view_port);
 	command_list ->RSSetScissorRects(1, &scissor_rect);
 	command_list ->ResourceBarrier(
@@ -507,6 +507,7 @@ void cg::renderer::dx12_renderer::move_to_next_frame()
 				fence_values[frame_index],
 				fence_event))
 		WaitForSingleObjectEx(fence_event, INFINITE, FALSE);
+		fence_values[frame_index]++;
 	}
 	fence_values[frame_index] = current_fence_value + 1;
 }
