@@ -39,6 +39,13 @@ void cg::renderer::dx12_renderer::destroy()
 void cg::renderer::dx12_renderer::update()
 {
 	// TODO Lab 3.08. Implement `update` method of `dx12_renderer`
+	auto now = std::chrono::high_resolution_clock::now();
+	std::chrono::duration <float> duration = now - current_time;
+	frame_duration = duration.count();
+	current_time = now;
+
+	cb.mwpMatrix = camera ->get_dxm_mvp_matrix();
+	memcpy(constant_buffer_data_begin, &cb, sizeof(cb));
 }
 
 void cg::renderer::dx12_renderer::render()
@@ -153,7 +160,6 @@ void cg::renderer::dx12_renderer::create_command_allocators()
 
 void cg::renderer::dx12_renderer::create_command_list()
 {
-	// TODO Lab 3.06. Create command allocators and a command list
 	THROW_IF_FAILED(device ->CreateCommandList(
 			0,
 			D3D12_COMMAND_LIST_TYPE_DIRECT,
